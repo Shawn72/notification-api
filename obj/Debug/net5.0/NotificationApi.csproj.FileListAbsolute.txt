@@ -117,3 +117,4 @@ C:\Users\shawn.ngutu.SMART0\OneDrive - Smart Applications International Limited\
 C:\Users\shawn.ngutu.SMART0\OneDrive - Smart Applications International Limited\NotificationsProject\NotificationApi\obj\Debug\net5.0\ref\NotificationApi.dll
 C:\Users\shawn.ngutu.SMART0\OneDrive - Smart Applications International Limited\NotificationsProject\NotificationApi\obj\Debug\net5.0\NotificationApi.pdb
 C:\Users\shawn.ngutu.SMART0\OneDrive - Smart Applications International Limited\NotificationsProject\NotificationApi\obj\Debug\net5.0\NotificationApi.genruntimeconfig.cache
+C:\Users\shawn.ngutu.SMART0\OneDrive - Smart Applications International Limited\NotificationsProject\NotificationApi\obj\Debug\net5.0\NotificationApi.csproj.AssemblyReference.cache
