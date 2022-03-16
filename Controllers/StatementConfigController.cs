@@ -45,14 +45,14 @@ namespace NotificationApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetStatementConfig(string id)
+        public IActionResult GetStatementConfig(int id)
         {
             var statement = _repo.GetCustomerStatConfig(id);
             return Ok(statement);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateStatementConfig(string id, [FromBody] IndividualStatementConfig statconfig)
+        public async Task<IActionResult> UpdateStatementConfig(int id, [FromBody] IndividualStatementConfig statconfig)
         {
             // additional product and model validation checks
 
@@ -66,7 +66,7 @@ namespace NotificationApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteStatementConfig(string id)
+        public async Task<IActionResult> DeleteStatementConfig(int id)
         {
             var stat = _repo.GetCustomerStatConfig(id);
             if (stat == null)

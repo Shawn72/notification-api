@@ -2,6 +2,7 @@
 
 FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
 WORKDIR /app
+RUN sed -i 's/TLSv1.2/TLSv1/g' /etc/ssl/openssl.cnf
 EXPOSE 8036
 EXPOSE 443
 

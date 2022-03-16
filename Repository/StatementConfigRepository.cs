@@ -34,7 +34,7 @@ namespace NotificationApi.Repository
             return await _context.individual_statement_config.ToListAsync();
         }
 
-        public IndividualStatementConfig GetCustomerStatConfig(string id) =>
+        public IndividualStatementConfig GetCustomerStatConfig(int id) =>
             _context.individual_statement_config.FirstOrDefault(p => p.id.Equals(id));
 
         public async Task UpdateCustomerStatConfig(IndividualStatementConfig statementConfig, IndividualStatementConfig dBstatementConfig)
