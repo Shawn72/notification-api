@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +12,8 @@ using NotificationApi.Interfaces;
 using NotificationApi.Logging;
 using NotificationApi.Models;
 using NotificationApi.Repository;
-
+using StackExchange.Redis;
+using System;
 
 namespace NotificationApi
 {
@@ -24,6 +27,7 @@ namespace NotificationApi
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
+        [System.Obsolete]
         public void ConfigureServices(IServiceCollection services)
         {
             string connectionString = Configuration.GetConnectionString("ConnectionStr"); 
@@ -57,6 +61,18 @@ namespace NotificationApi
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .WithExposedHeaders("X-Pagination"));
+            });
+
+            var redis = ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable("REDIS"));
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services
+                .AddDataProtection()
+                .PersistKeysToStackExchangeRedis(redis, "DataProtectionKeys");
+
+            services.AddStackExchangeRedisCache(option =>
+            {
+                option.Configuration = Environment.GetEnvironmentVariable("REDIS");
+                option.InstanceName = "RedisInstance";
             });
         }
 
