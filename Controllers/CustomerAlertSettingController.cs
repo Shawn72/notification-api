@@ -44,14 +44,14 @@ namespace NotificationApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetCustomerAlertSetting(string id)
+        public IActionResult GetCustomerAlertSetting(int id)
         {
             var calert = _repo.GetCustomerAlertSetting(id);
             return Ok(calert);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCustomerAlertSetting(string id, [FromBody] CustomerAlertSetting alertSetting)
+        public async Task<IActionResult> UpdateCustomerAlertSetting(int id, [FromBody] CustomerAlertSetting alertSetting)
         {
             // additional product and model validation checks
 
@@ -65,7 +65,7 @@ namespace NotificationApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCustomerAlertSetting(string id)
+        public async Task<IActionResult> DeleteCustomerAlertSetting(int id)
         {
             var alertc = _repo.GetCustomerAlertSetting(id);
             if (alertc == null)

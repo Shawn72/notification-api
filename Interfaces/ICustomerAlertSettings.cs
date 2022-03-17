@@ -7,7 +7,7 @@ namespace NotificationApi.Interfaces
     public interface ICustomerAlertSettings
     {
         Task CreateCustomerAlertSetting(CustomerAlertSetting customerAlertsetting);
-        CustomerAlertSetting GetCustomerAlertSetting(string id);
+        CustomerAlertSetting GetCustomerAlertSetting(int id);
         Task<IEnumerable<CustomerAlertSetting>> GetAllCustomerAlertSetting();
         Task UpdateCustomerAlertSetting(CustomerAlertSetting customerAlertsetting, CustomerAlertSetting dBcustomerAlertsetting);
         Task DeleteCustomerAlertSetting(CustomerAlertSetting customerAlertsetting);

@@ -2,19 +2,23 @@
 using NotificationApi.Context;
 using NotificationApi.Interfaces;
 using NotificationApi.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace NotificationApi.Repository
 {
-    public class CustomerAlertSettingRepository: ICustomerAlertSettings
+    public class CustomerAlertSettingRepository : ICustomerAlertSettings
     {
         private readonly DatabaseContext _context;
 
-        public CustomerAlertSettingRepository(DatabaseContext context)
+        private readonly IRedisCacheService _redisCacheService;
+
+        public CustomerAlertSettingRepository(DatabaseContext context, IRedisCacheService redisCacheService)
         {
             _context = context;
+            _redisCacheService = redisCacheService;
         }
 
         public async Task CreateCustomerAlertSetting(CustomerAlertSetting customerAlertsetting)
@@ -31,13 +35,39 @@ namespace NotificationApi.Repository
 
         public async Task<IEnumerable<CustomerAlertSetting>> GetAllCustomerAlertSetting()
         {
-            //get full list
-            return await _context.Customer_Alert_Setting.ToListAsync();
+            var redCachedId = _redisCacheService.Get<IEnumerable<CustomerAlertSetting>>("alert_settn_list");
+            if (redCachedId != null) return redCachedId; //return saved id on redis cache
+
+            else
+            {
+                //get full list
+                var alldata = await _context.Customer_Alert_Setting.ToListAsync();
+                //cache the object retrieved
+                if (alldata != null)
+                    _redisCacheService.Set<IEnumerable<CustomerAlertSetting>>("alert_settn_list", alldata);
+                //return the same object if accessed for the first time within the set timeout
+                return alldata;
+
+            }
         }
 
-        public  CustomerAlertSetting GetCustomerAlertSetting(string id) =>
-            _context.Customer_Alert_Setting.FirstOrDefault(p => p.id.Equals(id));
+        public CustomerAlertSetting GetCustomerAlertSetting(int id) { 
 
+            var redCachedId = _redisCacheService.Get<CustomerAlertSetting>(id.ToString());
+
+            if (redCachedId != null) return redCachedId; //return saved id on redis cache
+            else
+            {
+                CustomerAlertSetting alertSett = _context.Customer_Alert_Setting.FirstOrDefault(p => p.id ==Convert.ToInt32(id) );
+
+                //cache the object retrieved
+                if (alertSett != null)
+                    _redisCacheService.Set<CustomerAlertSetting>(id.ToString(), alertSett);
+                //return the same object if accessed for the first time within the set timeout
+                return alertSett;
+            }
+            
+        }
         public async Task UpdateCustomerAlertSetting(CustomerAlertSetting customerAlertsetting, CustomerAlertSetting dBcustomerAlertsetting)
         {
             dBcustomerAlertsetting.customer_name = customerAlertsetting.customer_name;

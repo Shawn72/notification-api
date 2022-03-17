@@ -17,14 +17,17 @@ namespace NotificationApi.Repository
 
         CultureInfo culture = new CultureInfo("en-US");
 
+        private readonly IRedisCacheService _redisCacheService;
+
         //public CustomerAlertRepository(DatabaseContext context)
         //{
         //    _context = context;
         //}
 
-        public CustomerAlertRepository(DatabaseContext context)
+        public CustomerAlertRepository(DatabaseContext context, IRedisCacheService redisCacheService)
         : base(context)
         {
+            _redisCacheService = redisCacheService;
         }
         public async Task CreateCustomerAlert(CustomerAlertModel customerAlert)
         {
@@ -40,10 +43,20 @@ namespace NotificationApi.Repository
 
         public async Task<IEnumerable<CustomerAlertModel>> GetAllCustomerAlert()
         {
-            //get full list
-            //default place holder
-            return await _context.CustomerAlert.OrderByDescending(i => i.AlertID)
-                        .Take(100).ToListAsync();
+            var redCachedId = _redisCacheService.Get<IEnumerable<CustomerAlertModel>>("customer_alert_list");
+            if (redCachedId != null) return redCachedId; //return saved id on redis cache
+            else
+            {
+                //get full list
+                var alldata = await _context.CustomerAlert.OrderByDescending(i => i.AlertID)
+                       .Take(100).ToListAsync();
+                //cache the object retrieved
+                if (alldata != null)
+                    _redisCacheService.Set<IEnumerable<CustomerAlertModel>>("customer_alert_list", alldata);
+                //return the same object if accessed for the first time within the set timeout
+                return alldata;
+            }
+
         }
 
         public CustomerAlertModel GetCustomerAlert(Int64 id) =>
@@ -58,8 +71,20 @@ namespace NotificationApi.Repository
 
         public PagedList<CustomerAlertModel> GetCustomerAlertPagedlist(PagingParameters pgParameters)
         {
-            return PagedList<CustomerAlertModel>.ToPagedList(FindAllAlerts(), pgParameters.PageNumber,
-              pgParameters.PageSize);           
+            //no redis cache, brings issues, but can cache the rest
+            try
+            {
+                //get full list
+                var pageddata = PagedList<CustomerAlertModel>.ToPagedList(FindAllAlerts(), pgParameters.PageNumber,
+              pgParameters.PageSize);
+               
+                //return the same object if accessed for the first time within the set timeout
+                return pageddata;
+            
+            }catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
 
         }
 
